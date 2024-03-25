@@ -1,7 +1,9 @@
 import { Component } from "react";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
-import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
+import Switch2Part from "./two-part-switch";
+
+//TODO: Change modular and concussive such that concussive is what is switched
 
 interface Props {}
 interface State {
@@ -18,7 +20,9 @@ export default class ToggleDamage extends Component<Props, State> {
   damageTypes = ["Piercing", "Bludgeoning", "Slashing"];
 
   updateActive = (values: string[]) => {
-    const currentlyActive = this.damageTypes.map((type) => values.includes(type.charAt(0)));
+    const currentlyActive = this.damageTypes.map((type) =>
+      values.includes(type.charAt(0)),
+    );
     this.setState({ dmgType: currentlyActive });
   };
 
@@ -32,18 +36,20 @@ export default class ToggleDamage extends Component<Props, State> {
     const { dmgType, multiType } = this.state;
     let opt = [];
 
-    if ((dmgType[2] && (dmgType[0] || dmgType[1])) || (dmgType[0] && dmgType[1])) {
+    if (
+      (dmgType[2] && (dmgType[0] || dmgType[1])) ||
+      (dmgType[0] && dmgType[1])
+    ) {
       opt.push(
-        <div className="flex items-center space-x-2" key="modular">
-          <Label htmlFor="mod-con-toggle">Concussive</Label>
-          <Switch
-            id="mod-con-toggle"
-            onCheckedChange={this.toggleMultiType}
-            checked={multiType || dmgType[2]}
-            disabled={dmgType[2]}
-          />
-          <Label htmlFor="mod-con-toggle">Modular</Label>
-        </div>
+        <Switch2Part
+          key="modular"
+          left="Concussive"
+          right="Modular"
+          id="mod-con-toggle"
+          checked={multiType || dmgType[2]}
+          disabled={dmgType[2]}
+          flip={this.toggleMultiType}
+        />,
       );
     }
 
@@ -61,9 +67,13 @@ export default class ToggleDamage extends Component<Props, State> {
   render() {
     return (
       <div className="flex flex-col space-y-2">
-      <Label htmlFor="dmgType">Damage Type</Label>
+        <Label htmlFor="dmgType">Damage Type</Label>
         <div className="flex flex-row justify-between">
-          <ToggleGroup id="dmgType" type="multiple" onValueChange={this.updateActive}>
+          <ToggleGroup
+            id="dmgType"
+            type="multiple"
+            onValueChange={this.updateActive}
+          >
             {this.showOptions()}
           </ToggleGroup>
           {this.checkTypes()}
@@ -72,4 +82,3 @@ export default class ToggleDamage extends Component<Props, State> {
     );
   }
 }
-
