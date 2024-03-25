@@ -3,13 +3,12 @@ import { Label } from "./ui/label";
 import { Switch } from "./ui/switch";
 
 interface Props {
-  key: string;
   left: string;
   right: string;
   id: string;
-  disabled: boolean;
-  checked: boolean;
-  flip: () => any;
+  disabled?: boolean;
+  checked?: boolean;
+  flip?: () => any;
 }
 interface State {
   on: boolean;
@@ -24,15 +23,18 @@ export default class Switch2Part extends Component<Props, State> {
     this.setState((prevState) => ({
       on: !prevState.on,
     }));
-    this.props.flip();
+    if(this.props.flip !== undefined){
+      this.props.flip();
+    }
   };
 
   render() {
-    const { key, left, right, id, disabled, checked } = this.props;
+    const { left, right, id, disabled, checked } = this.props;
     return (
-      <div className="flex items-center space-x-2" key={key}>
+      <div className="flex items-center space-x-2">
         <Label>{left}</Label>
         <Switch
+          key={id}
           id={id}
           onCheckedChange={this.toggle}
           checked={checked}

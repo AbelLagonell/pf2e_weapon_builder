@@ -2,19 +2,20 @@ import { Component } from "react";
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group";
 import { Label } from "./ui/label";
 import Switch2Part from "./two-part-switch";
-
-//TODO: Change modular and concussive such that concussive is what is switched
+import { Checkbox } from "./ui/checkbox";
 
 interface Props {}
 interface State {
   dmgType: boolean[]; // P, B, S
   multiType: boolean; // Concussive/Modular
+  nonlethal: boolean; // lethality
 }
 
 export default class ToggleDamage extends Component<Props, State> {
   state: State = {
     dmgType: [false, false, false],
     multiType: false,
+    nonlethal: false,
   };
 
   damageTypes = ["Piercing", "Bludgeoning", "Slashing"];
@@ -30,7 +31,16 @@ export default class ToggleDamage extends Component<Props, State> {
     this.setState((prevState) => ({
       multiType: !prevState.multiType,
     }));
+    if (this.state.dmgType[2]){
+      this.setState({multiType: false})
+    }
   };
+
+  toggleLethal = () => {
+    this.setState((prevState) => ({
+      nonlethal: !prevState.nonlethal,
+    }));
+  }
 
   checkTypes() {
     const { dmgType, multiType } = this.state;
@@ -41,12 +51,11 @@ export default class ToggleDamage extends Component<Props, State> {
       (dmgType[0] && dmgType[1])
     ) {
       opt.push(
-        <Switch2Part
-          key="modular"
-          left="Concussive"
-          right="Modular"
+        <Switch2Part key="test"
+          left="Modular"
+          right="Concussive"
           id="mod-con-toggle"
-          checked={multiType || dmgType[2]}
+          checked={multiType}
           disabled={dmgType[2]}
           flip={this.toggleMultiType}
         />,
@@ -68,8 +77,13 @@ export default class ToggleDamage extends Component<Props, State> {
     return (
       <div className="flex flex-col space-y-2">
         <Label htmlFor="dmgType">Damage Type</Label>
+        <div className="flex flex-row space-x-2 pt-2">
+          <Checkbox id="lethality" onCheckedChange={this.toggleLethal} />
+          <Label htmlFor="lethality">Nonlethal</Label>
+        </div>
         <div className="flex flex-row justify-between">
           <ToggleGroup
+            key="damageType"
             id="dmgType"
             type="multiple"
             onValueChange={this.updateActive}

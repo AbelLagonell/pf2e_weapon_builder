@@ -1,6 +1,6 @@
 interface KeyedOption {
-  key: number | string,
-  str: string
+  key: number | string;
+  str: string;
 }
 
-export type {KeyedOption}
+export type { KeyedOption };

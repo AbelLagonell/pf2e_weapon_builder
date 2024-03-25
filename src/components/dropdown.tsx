@@ -10,11 +10,11 @@ import { Button } from "./ui/button";
 import { KeyedOption } from "./types";
 import { Label } from "./ui/label";
 
-//TODO: Make Sure that flaw has a Switch2Part class in it so that when the increased training is picked it shows up.
-
 interface Props {
   options: KeyedOption[];
   name: string;
+  addTrait: (trait: KeyedOption) => any;
+  removeTrait: (trait: KeyedOption) => any;
 }
 interface State {
   active: KeyedOption[];
@@ -36,6 +36,7 @@ export default class Dropdown extends Component<Props, State> {
         active: [...prevState.active, optionToAdd],
         options: prevState.options.filter((opt) => opt.key !== key),
       }));
+      this.props.addTrait(optionToAdd);
     }
   };
 
@@ -47,6 +48,7 @@ export default class Dropdown extends Component<Props, State> {
         active: prevState.active.filter((opt) => opt.key !== key),
         options: [...prevState.options, optionToRemove],
       }));
+      this.props.removeTrait(optionToRemove);
     }
   };
 

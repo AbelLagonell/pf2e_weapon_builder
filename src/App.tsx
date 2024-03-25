@@ -1,12 +1,12 @@
-import './App.css'
-import Weapon_form from './components/weapon-form'
+import "./App.css";
+import Custom_Weapons from "./components/custom-weapons";
 
 function App() {
   return (
-    <div className='flex justify-center m-10'>
-      <Weapon_form></Weapon_form>
+    <div className="flex justify-center my-10 w-full">
+      <Custom_Weapons />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
