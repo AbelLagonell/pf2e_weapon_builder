@@ -15,6 +15,7 @@ interface Props {
   name: string;
   addTrait: (trait: KeyedOption) => any;
   removeTrait: (trait: KeyedOption) => any;
+  disabled?: boolean;
 }
 interface State {
   active: KeyedOption[];
@@ -86,12 +87,12 @@ export default class Dropdown extends Component<Props, State> {
   }
 
   render() {
-    const { name } = this.props;
+    const { name, disabled } = this.props;
     return (
       <div className="flex flex-col space-y-1.5">
         <Label htmlFor={name}>{name}</Label>
         <div className="flex flex-row">
-          <Select onValueChange={this.addActive}>
+          <Select disabled={disabled} onValueChange={this.addActive}>
             <SelectTrigger className="w-40 min-w-40 h-[42px]" id={name}>
               <SelectValue placeholder="Select">Select</SelectValue>
             </SelectTrigger>

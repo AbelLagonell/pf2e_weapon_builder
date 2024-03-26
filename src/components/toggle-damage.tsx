@@ -4,15 +4,18 @@ import { Label } from "./ui/label";
 import Switch2Part from "./two-part-switch";
 import { Checkbox } from "./ui/checkbox";
 
-interface Props {}
-interface State {
+interface Props {
+  getState: (arg0: DmgState) => any;
+}
+interface DmgState {
   dmgType: boolean[]; // P, B, S
   multiType: boolean; // Concussive/Modular
   nonlethal: boolean; // lethality
 }
 
-export default class ToggleDamage extends Component<Props, State> {
-  state: State = {
+export type { DmgState };
+export default class ToggleDamage extends Component<Props, DmgState> {
+  state: DmgState = {
     dmgType: [false, false, false],
     multiType: false,
     nonlethal: false,
@@ -20,27 +23,45 @@ export default class ToggleDamage extends Component<Props, State> {
 
   damageTypes = ["Piercing", "Bludgeoning", "Slashing"];
 
+  onTriggerUpdate() {
+    this.props.getState(this.state);
+  }
+
   updateActive = (values: string[]) => {
     const currentlyActive = this.damageTypes.map((type) =>
       values.includes(type.charAt(0)),
     );
-    this.setState({ dmgType: currentlyActive });
+    this.setState({ dmgType: currentlyActive }, () => {
+      this.onTriggerUpdate();
+    });
   };
 
   toggleMultiType = () => {
-    this.setState((prevState) => ({
-      multiType: !prevState.multiType,
-    }));
-    if (this.state.dmgType[2]){
-      this.setState({multiType: false})
+    this.setState(
+      (prevState) => ({
+        multiType: !prevState.multiType,
+      }),
+      () => {
+        this.onTriggerUpdate();
+      },
+    );
+    if (this.state.dmgType[2]) {
+      this.setState({ multiType: false }, () => {
+        this.onTriggerUpdate();
+      });
     }
   };
 
   toggleLethal = () => {
-    this.setState((prevState) => ({
-      nonlethal: !prevState.nonlethal,
-    }));
-  }
+    this.setState(
+      (prevState) => ({
+        nonlethal: !prevState.nonlethal,
+      }),
+      () => {
+        this.onTriggerUpdate();
+      },
+    );
+  };
 
   checkTypes() {
     const { dmgType, multiType } = this.state;
@@ -51,7 +72,8 @@ export default class ToggleDamage extends Component<Props, State> {
       (dmgType[0] && dmgType[1])
     ) {
       opt.push(
-        <Switch2Part key="test"
+        <Switch2Part
+          key="test"
           left="Modular"
           right="Concussive"
           id="mod-con-toggle"
@@ -76,7 +98,7 @@ export default class ToggleDamage extends Component<Props, State> {
   render() {
     return (
       <div className="flex flex-col space-y-2">
-        <Label htmlFor="dmgType">Damage Type</Label>
+        <Label>Damage Type</Label>
         <div className="flex flex-row space-x-2 pt-2">
           <Checkbox id="lethality" onCheckedChange={this.toggleLethal} />
           <Label htmlFor="lethality">Nonlethal</Label>

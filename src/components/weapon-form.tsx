@@ -8,37 +8,132 @@ import {
 } from "./ui/card";
 import { Input } from "./ui/input";
 import Dropdown from "./dropdown";
-import ToggleDamage from "./toggle-damage";
+import ToggleDamage, { DmgState } from "./toggle-damage";
 import { flaws, greater, major, minor } from "./tables";
 import { Component } from "react";
 import { Textarea } from "./ui/textarea";
 import { KeyedOption } from "./types";
 
 interface Props {
-  getState: (state: State) => any;
+  getState: (state: WeaponState) => any;
 }
-interface State {
+interface WeaponState {
   weaponName: string;
   weaponDesc: string;
   activeTraits: KeyedOption[];
+  damageType: string[];
+  multiType: boolean;
+  nonlethal: boolean;
 }
 
-export default class Weapon_Form extends Component<Props, State> {
-  state: State = {
+export type { WeaponState };
+
+export default class Weapon_Form extends Component<Props, WeaponState> {
+  state: WeaponState = {
     weaponName: "",
     weaponDesc: "",
     activeTraits: [],
+    damageType: [],
+    multiType: false,
+    nonlethal: false,
   };
+
+  points = 1;
+  disabled = [false, true, true];
 
   onTriggerUpdate() {
     this.props.getState(this.state);
   }
 
+  pointManagement(trait: KeyedOption, multiply: number = 1) {
+    switch (trait.key) {
+      //FLAWS
+      case 0:
+      case 2:
+      case 4:
+        this.points += 3 * multiply;
+        break;
+      case 3:
+        this.points *= 1 * multiply;
+        break;
+      case 1:
+        this.points += 6 * multiply;
+        break;
+      //MINOR
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      case 11:
+      case 12:
+      case 13:
+      case 14:
+      case 15:
+      case 16:
+      case 17:
+      case 18:
+        this.points -= 1 * multiply;
+        break;
+      //GREATER
+      case 19:
+      case 20:
+      case 21:
+      case 22:
+      case 23:
+      case 24:
+        this.points -= 2 * multiply;
+        break;
+      //MAJOR
+      case 25:
+      case 26:
+      case 27:
+      case 28:
+        this.points -= 3 * multiply;
+        break;
+      default:
+        break;
+    }
+
+    if (this.points === 0) {
+      this.disabled = [true, true, true];
+    } else if (this.points === 1) {
+      this.disabled = [false, true, true];
+    } else if (this.points === 2) {
+      this.disabled = [false, false, true];
+    } else {
+      this.disabled = [false, false, false];
+    }
+  }
+
+  updateDamage = (state: DmgState) => {
+    let dmgTypes = [];
+    if (state.dmgType[0]) {
+      dmgTypes.push("Piercing");
+    }
+    if (state.dmgType[1]) {
+      dmgTypes.push("Bludgeoning");
+    }
+    if (state.dmgType[2]) {
+      dmgTypes.push("Slashing");
+    }
+    this.setState(
+      {
+        damageType: dmgTypes,
+        multiType: state.multiType,
+        nonlethal: state.nonlethal,
+      },
+      () => {
+        this.onTriggerUpdate();
+      },
+    );
+  };
+
   updateName = (event: any) => {
-    this.setState({
-      weaponName: event.target.valu,
+    const newWeaponName = event.target.value;
+    this.setState({ weaponName: newWeaponName }, () => {
+      this.onTriggerUpdate();
     });
-    this.onTriggerUpdate();
   };
 
   updateDesc = (event: any) => {
@@ -49,19 +144,29 @@ export default class Weapon_Form extends Component<Props, State> {
   };
 
   addTraits = (trait: KeyedOption) => {
-    this.setState((prevState) => ({
-      activeTraits: [...prevState.activeTraits, trait],
-    }));
-    this.onTriggerUpdate();
+    this.setState(
+      (prevState) => ({
+        activeTraits: [...prevState.activeTraits, trait],
+      }),
+      () => {
+        this.onTriggerUpdate();
+        this.pointManagement(trait);
+      },
+    );
   };
 
   removeTraits = (trait: KeyedOption) => {
-    this.setState((prevState) => ({
-      activeTraits: prevState.activeTraits.filter(
-        (opt) => opt.key !== trait.key,
-      ),
-    }));
-    this.onTriggerUpdate();
+    this.setState(
+      (prevState) => ({
+        activeTraits: prevState.activeTraits.filter(
+          (opt) => opt.key !== trait.key,
+        ),
+      }),
+      () => {
+        this.onTriggerUpdate();
+        this.pointManagement(trait, -1);
+      },
+    );
   };
 
   render() {
@@ -93,20 +198,23 @@ export default class Weapon_Form extends Component<Props, State> {
                   addTrait={this.addTraits}
                   removeTrait={this.removeTraits}
                 />
-                <ToggleDamage />
+                <ToggleDamage getState={this.updateDamage} />
                 <Dropdown
+                  disabled={this.disabled[0]}
                   options={minor}
                   name="Minor"
                   addTrait={this.addTraits}
                   removeTrait={this.removeTraits}
                 />
                 <Dropdown
+                  disabled={this.disabled[1]}
                   options={greater}
                   name="Greater"
                   addTrait={this.addTraits}
                   removeTrait={this.removeTraits}
                 />
                 <Dropdown
+                  disabled={this.disabled[2]}
                   options={major}
                   name="Major"
                   addTrait={this.addTraits}
