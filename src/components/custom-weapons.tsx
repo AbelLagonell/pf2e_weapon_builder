@@ -4,7 +4,7 @@ import Weapon_Content from "./weapon-content";
 
 interface Props {}
 
-//TODO Add dice
+//TODO Add dice, Make sure you cant add more than two Two-handed
 
 export default class Custom_Weapons extends Component<Props, WeaponState> {
   state: WeaponState = {
