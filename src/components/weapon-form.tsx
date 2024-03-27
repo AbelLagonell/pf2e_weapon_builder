@@ -14,6 +14,7 @@ import { Component } from "react";
 import { Textarea } from "./ui/textarea";
 import { KeyedOption } from "./types";
 import Dice_Tracker from "./damage-dice";
+import { Slider } from "./ui/slider";
 
 interface Props {
   getState: (state: WeaponState) => any;
@@ -55,7 +56,7 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
         this.points += 3 * multiply;
         break;
       case 3:
-        this.points *= 1 * multiply;
+        this.points += 1 * multiply;
         break;
       case 1:
         this.points += 6 * multiply;
@@ -82,7 +83,9 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
       //GREATER
       case 23:
         if (this.state.activeTraits.find((value) => value.key === 23))
-          this.points -= 3 * multiply;
+          this.points -= 6 * multiply;
+        else this.points -= 3 * multiply;
+        break;
       case 19:
       case 20:
       case 21:
@@ -100,7 +103,7 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
         break;
     }
 
-    if (this.points === 0) {
+    if (this.points <= 0) {
       this.disabled = [true, true, true];
     } else if (this.points === 1) {
       this.disabled = [false, true, true];
@@ -157,6 +160,7 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
         this.onTriggerUpdate();
         this.pointManagement(trait);
         console.log(this.state.activeTraits);
+        console.log(this.points);
       },
     );
   };
@@ -172,15 +176,36 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
         this.onTriggerUpdate();
         this.pointManagement(trait, -1);
         console.log(this.state.activeTraits);
+        console.log(this.points);
       },
     );
   };
 
   onDiceChange = (which: boolean) => {
-    let maxval = this.state.activeTraits;
-    this.pointManagement({ key: 29, str: "" }, which ? 1 : -1);
-    this.addTraits({ key: 29, str: "" });
+    let key = 29;
+
+    if (which) this.addTraits({ key: key, str: "" });
+    else this.removeTraits({ key: key, str: "" });
   };
+
+  slider() {
+    if (this.state.activeTraits.find((value) => value.key === 0)) {
+      return (
+        <div className="flex flex-row">
+          <Label htmlFor="loadingActions" className="w-full">
+            Loading Actions
+          </Label>
+          <Slider
+            id="loadingActions"
+            defaultValue={[1]}
+            max={3}
+            step={1}
+            min={1}
+          />
+        </div>
+      );
+    }
+  }
 
   render() {
     return (
@@ -205,12 +230,15 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
                     onChange={this.updateName}
                   />
                 </div>
-                <Dropdown
-                  options={flaws}
-                  name="Flaws"
-                  addTrait={this.addTraits}
-                  removeTrait={this.removeTraits}
-                />
+                <div className="flex flex-col space-y-4">
+                  <Dropdown
+                    options={flaws}
+                    name="Flaws"
+                    addTrait={this.addTraits}
+                    removeTrait={this.removeTraits}
+                  />
+                  {this.slider()}
+                </div>
                 <ToggleDamage getState={this.updateDamage} />
                 <Dropdown
                   disabled={this.disabled[0]}
@@ -239,7 +267,8 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
                   removeTrait={this.removeTraits}
                 />
                 <Dice_Tracker
-                  disabled={this.disabled[2]}
+                  validDown={false}
+                  validUp={this.disabled[2]}
                   activeTraits={this.state.activeTraits}
                   changed={this.onDiceChange}
                 />

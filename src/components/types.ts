@@ -1,5 +1,5 @@
 interface KeyedOption {
-  key: number | string;
+  key: number;
   str: string;
 }
 

@@ -27,7 +27,7 @@ let minor: KeyedOption[] = [
 let greater: KeyedOption[] = [
   { key: 19, str: "Agile" },
   { key: 20, str: "Deadly" },
-  { key: 21, str: "Jousting" },
+  { key: 21, str: "Jousting d6" },
   { key: 22, str: "Parry" },
   { key: 23, str: "Range" },
   { key: 24, str: "Trip" },

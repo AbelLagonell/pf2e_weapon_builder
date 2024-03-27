@@ -2,78 +2,34 @@ import { Component } from "react";
 import { KeyedOption } from "./types";
 import { Button } from "./ui/button";
 import { Minus, Plus } from "lucide-react";
-
-enum dice {
-  smallest = "1d4",
-  smaller = "1d6",
-  medium = "1d8",
-  bigger = "1d10",
-  biggest = "1d12",
-}
+import { decrement, dice, increment } from "./diceUtils";
 
 interface DiceProps {
   activeTraits: KeyedOption[];
-  disabled: boolean;
+  validUp: boolean;
+  validDown: boolean;
   changed: (arg0: boolean) => any;
 }
 interface DiceState {
   diceSize: dice;
-  disabledUp: boolean;
-  disabledDown: boolean;
 }
 
 export default class Dice_Tracker extends Component<DiceProps, DiceState> {
   state: DiceState = {
     diceSize: dice.smallest,
-    disabledUp: false,
-    disabledDown: false,
   };
 
   increment() {
-    this.setState({ disabledDown: false });
-    switch (this.state.diceSize) {
-      case dice.smallest:
-        this.setState({ diceSize: dice.smaller });
-        break;
-      case dice.smaller:
-        this.setState({ diceSize: dice.medium });
-        break;
-      case dice.medium:
-        this.setState({ diceSize: dice.bigger });
-        break;
-      case dice.bigger:
-        this.setState({ diceSize: dice.biggest });
-        break;
-      case dice.biggest:
-        this.setState({ disabledUp: true });
-        break;
-      default:
-        break;
-    }
+    this.setState((prevState) => ({
+      diceSize: increment(prevState.diceSize),
+    }));
     this.props.changed(true);
   }
 
   decrement() {
-    this.setState({ disabledUp: false });
-    switch (this.state.diceSize) {
-      case dice.biggest:
-        this.setState({ diceSize: dice.bigger });
-        break;
-      case dice.bigger:
-        this.setState({ diceSize: dice.medium });
-        break;
-      case dice.medium:
-        this.setState({ diceSize: dice.smaller });
-        break;
-      case dice.smaller:
-        this.setState({ diceSize: dice.smallest });
-        break;
-      case dice.smallest:
-        this.setState({ disabledDown: true });
-        break;
-      default:
-        break;
-    }
+    this.setState((prevState) => ({
+      diceSize: decrement(prevState.diceSize),
+    }));
     this.props.changed(false);
   }
 
@@ -93,9 +49,20 @@ export default class Dice_Tracker extends Component<DiceProps, DiceState> {
     });
   }
 
-  determineDisable(bool: boolean) {
-    if (this.props.disabled) return true;
-    else return bool;
+  determineDisable(upDown: boolean) {
+    const { validUp, validDown } = this.props;
+
+    if (upDown) {
+      //UP
+      if (validUp) return true;
+      if (this.state.diceSize === dice.biggest) return true;
+      return false;
+    } else {
+      //DOWN
+      if (validDown) return true;
+      if (this.state.diceSize === dice.smallest) return true;
+      return false;
+    }
   }
 
   render() {
@@ -106,7 +73,7 @@ export default class Dice_Tracker extends Component<DiceProps, DiceState> {
           type="button"
           variant="outline"
           onClick={() => this.decrement()}
-          disabled={this.determineDisable(this.state.disabledDown)}
+          disabled={this.determineDisable(false)}
         >
           <Minus />
         </Button>
@@ -118,7 +85,7 @@ export default class Dice_Tracker extends Component<DiceProps, DiceState> {
           type="button"
           variant="outline"
           onClick={() => this.increment()}
-          disabled={this.determineDisable(this.state.disabledUp)}
+          disabled={this.determineDisable(true)}
         >
           <Plus />
         </Button>
