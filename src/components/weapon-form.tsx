@@ -26,6 +26,7 @@ interface WeaponState {
   damageType: string[];
   multiType: boolean;
   nonlethal: boolean;
+  currentLoading?: number;
 }
 
 export type { WeaponState };
@@ -38,6 +39,7 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
     damageType: [],
     multiType: false,
     nonlethal: false,
+    currentLoading: 0,
   };
 
   points = 1;
@@ -51,6 +53,8 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
     switch (trait.key) {
       //FLAWS
       case 0:
+        this.points += 3 * this.state.currentLoading * multiply;
+        break;
       case 2:
       case 4:
         this.points += 3 * multiply;
@@ -188,6 +192,12 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
     else this.removeTraits({ key: key, str: "" });
   };
 
+  calculatePoints = (value: number[]) => {
+    this.removeTraits(flaws[0]);
+    this.setState({ currentLoading: value[0] });
+    this.addTraits(flaws[0]);
+  };
+
   slider() {
     if (this.state.activeTraits.find((value) => value.key === 0)) {
       return (
@@ -201,6 +211,7 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
             max={3}
             step={1}
             min={1}
+            onValueChange={this.calculatePoints}
           />
         </div>
       );
