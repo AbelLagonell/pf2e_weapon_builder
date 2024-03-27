@@ -16,6 +16,7 @@ interface Props {
   addTrait: (trait: KeyedOption) => any;
   removeTrait: (trait: KeyedOption) => any;
   disabled?: boolean;
+  check?: KeyedOption;
 }
 interface State {
   active: KeyedOption[];

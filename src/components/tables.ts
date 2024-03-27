@@ -21,7 +21,6 @@ let minor: KeyedOption[] = [
   { key: 14, str: "Sweep" },
   { key: 15, str: "Thrown" },
   { key: 16, str: "Twin" },
-  { key: 17, str: "Two Handed" },
   { key: 18, str: "Versatile" },
 ];
 

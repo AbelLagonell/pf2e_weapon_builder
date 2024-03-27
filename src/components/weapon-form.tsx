@@ -13,6 +13,7 @@ import { flaws, greater, major, minor } from "./tables";
 import { Component } from "react";
 import { Textarea } from "./ui/textarea";
 import { KeyedOption } from "./types";
+import Dice_Tracker from "./damage-dice";
 
 interface Props {
   getState: (state: WeaponState) => any;
@@ -59,6 +60,9 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
       case 1:
         this.points += 6 * multiply;
         break;
+      case 5:
+        this.points += 5 * multiply;
+        break;
       //MINOR
       case 6:
       case 7:
@@ -76,11 +80,13 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
         this.points -= 1 * multiply;
         break;
       //GREATER
+      case 23:
+        if (this.state.activeTraits.find((value) => value.key === 23))
+          this.points -= 3 * multiply;
       case 19:
       case 20:
       case 21:
       case 22:
-      case 23:
       case 24:
         this.points -= 2 * multiply;
         break;
@@ -89,9 +95,8 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
       case 26:
       case 27:
       case 28:
-        this.points -= 3 * multiply;
-        break;
       default:
+        this.points -= 3 * multiply;
         break;
     }
 
@@ -151,6 +156,7 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
       () => {
         this.onTriggerUpdate();
         this.pointManagement(trait);
+        console.log(this.state.activeTraits);
       },
     );
   };
@@ -165,8 +171,15 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
       () => {
         this.onTriggerUpdate();
         this.pointManagement(trait, -1);
+        console.log(this.state.activeTraits);
       },
     );
+  };
+
+  onDiceChange = (which: boolean) => {
+    let maxval = this.state.activeTraits;
+    this.pointManagement({ key: 29, str: "" }, which ? 1 : -1);
+    this.addTraits({ key: 29, str: "" });
   };
 
   render() {
@@ -205,6 +218,11 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
                   name="Minor"
                   addTrait={this.addTraits}
                   removeTrait={this.removeTraits}
+                  check={
+                    this.state.activeTraits.find((value) => value.key === 1)
+                      ? this.state.activeTraits.find((value) => value.key === 1)
+                      : undefined
+                  }
                 />
                 <Dropdown
                   disabled={this.disabled[1]}
@@ -219,6 +237,11 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
                   name="Major"
                   addTrait={this.addTraits}
                   removeTrait={this.removeTraits}
+                />
+                <Dice_Tracker
+                  disabled={this.disabled[2]}
+                  activeTraits={this.state.activeTraits}
+                  changed={this.onDiceChange}
                 />
                 <Textarea
                   placeholder="Insert description here..."
