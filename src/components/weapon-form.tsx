@@ -42,8 +42,8 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
     currentLoading: 0,
   };
 
-  points = 1;
-  disabled = [false, true, true];
+  points = 4;
+  disabled = [false, false, false];
 
   onTriggerUpdate() {
     this.props.getState(this.state);
@@ -53,8 +53,6 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
     switch (trait.key) {
       //FLAWS
       case 0:
-        this.points += 3 * this.state.currentLoading * multiply;
-        break;
       case 2:
       case 4:
         this.points += 3 * multiply;
@@ -163,8 +161,6 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
       () => {
         this.onTriggerUpdate();
         this.pointManagement(trait);
-        console.log(this.state.activeTraits);
-        console.log(this.points);
       },
     );
   };
@@ -179,8 +175,6 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
       () => {
         this.onTriggerUpdate();
         this.pointManagement(trait, -1);
-        console.log(this.state.activeTraits);
-        console.log(this.points);
       },
     );
   };
@@ -193,9 +187,13 @@ export default class Weapon_Form extends Component<Props, WeaponState> {
   };
 
   calculatePoints = (value: number[]) => {
-    this.removeTraits(flaws[0]);
-    this.setState({ currentLoading: value[0] });
-    this.addTraits(flaws[0]);
+    if (value[0] > this.state.currentLoading) {
+      this.points += 3;
+      this.setState({ currentLoading: value[0] });
+    } else if (value[0] < this.state.currentLoading) {
+      this.points -= 3;
+      this.setState({ currentLoading: value[0] });
+    }
   };
 
   slider() {
