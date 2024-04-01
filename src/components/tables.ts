@@ -31,10 +31,11 @@ let greater: KeyedOption[] = [
   { key: 22, str: "Parry" },
   { key: 23, str: "Range" },
   { key: 24, str: "Trip" },
+  { key: 25, str: "Scatter" },
 ];
 
 let major: KeyedOption[] = [
-  { key: 25, str: "Attached" },
+  { key: 29, str: "Attached" },
   { key: 26, str: "Fatal" },
   { key: 27, str: "Reach" },
   { key: 28, str: "Unarmed" },
