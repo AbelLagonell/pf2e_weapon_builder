@@ -6,7 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { KeyedOption } from "./types";
+import { KeyedOption, Trait } from "./types";
 import { Badge } from "./ui/badge";
 import { dice, increment } from "./diceUtils";
 
@@ -16,7 +16,7 @@ interface Props {
   damage: string[];
   modular?: string;
   lethality?: boolean;
-  traits: KeyedOption[];
+  traits: Trait[];
 }
 
 interface State {}
@@ -25,18 +25,18 @@ export default class Weapon_Content extends Component<Props, State> {
   printTraits() {
     let opt = [];
     for (let traits of this.props.traits) {
-      if (traits.key >= 29) continue;
-      if (traits.key === 20) {
+      if (traits.id[0] === "d") continue;
+      if (traits.id === "gD") {
         let cDice = increment(this.printDice());
-        opt.push(<Badge key={traits.key}>{traits.str + " " + cDice}</Badge>);
+        opt.push(<Badge key={traits.id}>{traits.trait + " " + cDice}</Badge>);
         continue;
       }
-      if (traits.key === 26) {
+      if (traits.id === "MF") {
         let cDice = increment(increment(this.printDice()));
-        opt.push(<Badge key={traits.key}>{traits.str + " " + cDice}</Badge>);
+        opt.push(<Badge key={traits.id}>{traits.trait + " " + cDice}</Badge>);
         continue;
       }
-      opt.push(<Badge key={traits.key}>{traits.str}</Badge>);
+      opt.push(<Badge key={traits.id}>{traits.trait}</Badge>);
     }
     return opt;
   }
@@ -56,7 +56,7 @@ export default class Weapon_Content extends Component<Props, State> {
     let count = 0;
     let diceSize = dice.smallest;
     for (let traits of this.props.traits) {
-      if (traits.key >= 29) count++;
+      if (traits.id[0] === "d") count++;
     }
     for (let _ = 0; _ < count; _++) {
       diceSize = increment(diceSize);

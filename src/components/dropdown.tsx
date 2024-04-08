@@ -7,20 +7,19 @@ import {
   SelectValue,
 } from "./ui/select";
 import { Button } from "./ui/button";
-import { KeyedOption } from "./types";
+import { Trait } from "./types";
 import { Label } from "./ui/label";
 
 interface Props {
-  options: KeyedOption[];
+  options: Trait[];
   name: string;
-  addTrait: (trait: KeyedOption) => any;
-  removeTrait: (trait: KeyedOption) => any;
+  updateTrait: (trait: Trait) => any;
   disabled?: boolean;
-  check?: KeyedOption;
+  disabledButtons?: boolean;
 }
 interface State {
-  active: KeyedOption[];
-  options: KeyedOption[];
+  active: Trait[];
+  options: Trait[];
 }
 
 export default class Dropdown extends Component<Props, State> {
@@ -29,28 +28,26 @@ export default class Dropdown extends Component<Props, State> {
     options: this.props.options,
   };
 
-  addActive = (value: string) => {
-    if (value === "") return;
-    const key = +value;
-    const optionToAdd = this.state.options.find((opt) => opt.key === key);
+  addActive = (id: string) => {
+    if (id === "") return;
+    const optionToAdd = this.state.options.find((opt) => opt.id === id);
     if (optionToAdd) {
       this.setState((prevState) => ({
         active: [...prevState.active, optionToAdd],
-        options: prevState.options.filter((opt) => opt.key !== key),
+        options: prevState.options.filter((opt) => opt.id !== id),
       }));
-      this.props.addTrait(optionToAdd);
+      this.props.updateTrait(optionToAdd);
     }
   };
 
-  removeActive = (key: number | string) => {
-    if (typeof key === "string") return;
-    const optionToRemove = this.state.active.find((opt) => opt.key === key);
+  removeActive = (id: string) => {
+    const optionToRemove = this.state.active.find((opt) => opt.id === id);
     if (optionToRemove) {
       this.setState((prevState) => ({
-        active: prevState.active.filter((opt) => opt.key !== key),
+        active: prevState.active.filter((opt) => opt.id !== id),
         options: [...prevState.options, optionToRemove],
       }));
-      this.props.removeTrait(optionToRemove);
+      this.props.updateTrait(optionToRemove);
     }
   };
 
@@ -59,8 +56,8 @@ export default class Dropdown extends Component<Props, State> {
 
     for (let option of this.state.options) {
       opt.push(
-        <SelectItem value={option.key.toString()} key={option.key}>
-          {option.str}
+        <SelectItem value={option.id} key={option.id}>
+          {option.trait}
         </SelectItem>,
       );
     }
@@ -76,10 +73,11 @@ export default class Dropdown extends Component<Props, State> {
         <Button
           type="button"
           variant="outline"
-          key={option.key}
-          onClick={() => this.removeActive(option.key)}
+          key={option.id}
+          disabled={this.props.disabledButtons}
+          onClick={() => this.removeActive(option.id)}
         >
-          {option.str}
+          {option.trait}
         </Button>,
       );
     }

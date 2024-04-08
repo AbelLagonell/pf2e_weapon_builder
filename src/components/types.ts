@@ -3,4 +3,11 @@ interface KeyedOption {
   str: string;
 }
 
-export type { KeyedOption };
+interface Trait {
+  id: string;
+  trait: string;
+  points: number;
+  special?: boolean;
+}
+
+export type { KeyedOption, Trait };
